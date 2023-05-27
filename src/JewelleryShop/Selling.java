@@ -2,16 +2,17 @@ package JewelleryShop;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import net.proteanit.sql.DbUtils;
 
-/**
- *
- * @author Tanvir
- */
+
 public class Selling extends javax.swing.JFrame {
 
     
@@ -36,6 +37,38 @@ public class Selling extends javax.swing.JFrame {
         } catch(Exception e){
             
         }
+    }
+    
+    int BNum;
+    
+    private void CountBill(){
+        try{
+            St1 = Con.createStatement();
+            Rs1 = St1.executeQuery("select Max(BNum) from BillTbl");
+            Rs1.next();
+            BNum = Rs1.getInt(1)+1;
+        } catch(Exception e){
+            
+        }
+    }
+    
+    private void InsertBill(){
+            try {
+                CountBill();
+                Con = DriverManager.getConnection("jdbc:mysql://localhost:3306/management","root","");
+                PreparedStatement Pst = Con.prepareStatement("Insert into billtbl values(?,?,?,?)");
+                Pst.setInt(1, BNum);
+                Pst.setString(2, SellerField.getText());
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/mm/dd");
+                LocalDateTime now = LocalDateTime.now();
+                Pst.setString(3, now.toString().substring(0, 10));
+                Pst.setInt(4, GrandTotal);
+                int row = Pst.executeUpdate();
+                Con.close();
+                ShowProducts();
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(this, ex);
+            }
     }
 
     /**
@@ -66,22 +99,25 @@ public class Selling extends javax.swing.JFrame {
         jScrollPane3 = new javax.swing.JScrollPane();
         items_list = new javax.swing.JTable();
         print = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
+        TotalAmount = new javax.swing.JLabel();
+        Dashboard = new javax.swing.JLabel();
+        Logout = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        ViewSells = new javax.swing.JLabel();
+        ViewBills = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(204, 204, 204));
         setUndecorated(true);
         setResizable(false);
 
-        jPanel1.setBackground(new java.awt.Color(204, 204, 204));
+        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
 
         jPanel2.setBackground(new java.awt.Color(0, 102, 102));
 
         jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel4.setText("Sell Products");
+        jLabel4.setText("View Bill");
 
         jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(255, 255, 255));
@@ -138,7 +174,7 @@ public class Selling extends javax.swing.JFrame {
 
         jLabel9.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel9.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel9.setText("Price");
+        jLabel9.setText("Price (Tk.)");
 
         jLabel10.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel10.setForeground(new java.awt.Color(255, 255, 255));
@@ -177,6 +213,11 @@ public class Selling extends javax.swing.JFrame {
             }
         });
 
+        TotalAmount.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        TotalAmount.setForeground(new java.awt.Color(255, 255, 255));
+        TotalAmount.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        TotalAmount.setText("TOTAL");
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -206,7 +247,7 @@ public class Selling extends javax.swing.JFrame {
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGap(159, 159, 159)
                         .addComponent(addBillButton)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 35, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 44, Short.MAX_VALUE)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -215,11 +256,14 @@ public class Selling extends javax.swing.JFrame {
                         .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(97, 97, 97))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                        .addComponent(print, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(108, 108, 108))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 428, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(28, 28, 28))))
+                        .addGap(28, 28, 28))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                        .addComponent(TotalAmount, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(135, 135, 135))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                        .addComponent(print, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(109, 109, 109))))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -228,10 +272,11 @@ public class Selling extends javax.swing.JFrame {
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
                 .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(12, 12, 12)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jLabel12))
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
@@ -256,20 +301,42 @@ public class Selling extends javax.swing.JFrame {
                         .addGap(16, 16, 16)
                         .addComponent(jLabel11)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 530, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(8, 8, 8)
+                        .addComponent(TotalAmount, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(print, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(18, Short.MAX_VALUE))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
 
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel1.setText("Items");
+        Dashboard.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        Dashboard.setText("Items");
+        Dashboard.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                DashboardMouseClicked(evt);
+            }
+        });
 
-        jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel2.setText("Selling");
+        Logout.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        Logout.setText("Logout");
+        Logout.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                LogoutMouseClicked(evt);
+            }
+        });
 
-        jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel3.setText("Logout");
+        jLabel7.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+
+        ViewSells.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        ViewSells.setText("View Sells");
+        ViewSells.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                ViewSellsMouseClicked(evt);
+            }
+        });
+
+        ViewBills.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        ViewBills.setText("View Bill");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -278,22 +345,34 @@ public class Selling extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(21, 21, 21)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 110, Short.MAX_VALUE)
+                    .addComponent(Dashboard, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(ViewBills)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(ViewSells)
+                            .addComponent(Logout, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(131, 131, 131)
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel2)
+                .addGap(64, 64, 64)
+                .addComponent(Dashboard)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(ViewBills)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(13, 13, 13)
+                        .addComponent(jLabel7))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(ViewSells)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel3)
-                .addGap(35, 35, 35))
+                .addComponent(Logout)
+                .addGap(24, 24, 24))
             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
@@ -313,7 +392,12 @@ public class Selling extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void printActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printActionPerformed
-        // TODO add your handling code here:
+        try{
+            InsertBill();
+            bill_items_list.print();
+        } catch(Exception e){
+            
+        }
     }//GEN-LAST:event_printActionPerformed
 
     private void PrQtyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PrQtyActionPerformed
@@ -328,12 +412,16 @@ public class Selling extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_SellerFieldActionPerformed
 
+    
+    int GrandTotal = 0;
     private void addBillButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addBillButtonActionPerformed
         
         if (PrNameField.getText().isEmpty() || PrQty.getText().isEmpty()) {
              JOptionPane.showMessageDialog(this, "Missing Information.");
         } else {
         int Total = Integer.valueOf(PrPrice.getText()) * Integer.valueOf(PrQty.getText());
+        GrandTotal = GrandTotal + Total;
+        TotalAmount.setText("TOTAL: "+GrandTotal+" Tk.");
         DefaultTableModel model = (DefaultTableModel) bill_items_list.getModel();
         String nextRowId = Integer.toString(model.getRowCount());
         model.addRow(new Object[]{
@@ -358,6 +446,21 @@ public class Selling extends javax.swing.JFrame {
         PrNameField.setText(model.getValueAt(MyIndex, 1).toString());
         PrPrice.setText(model.getValueAt(MyIndex, 3).toString());
     }//GEN-LAST:event_items_listMouseClicked
+
+    private void LogoutMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_LogoutMouseClicked
+        new Login().setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_LogoutMouseClicked
+
+    private void DashboardMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_DashboardMouseClicked
+        new Items().setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_DashboardMouseClicked
+
+    private void ViewSellsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ViewSellsMouseClicked
+        new ViewSells().setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_ViewSellsMouseClicked
 
     /**
      * @param args the command line arguments
@@ -395,22 +498,25 @@ public class Selling extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel Dashboard;
+    private javax.swing.JLabel Logout;
     private javax.swing.JTextField PrNameField;
     private javax.swing.JTextField PrPrice;
     private javax.swing.JTextField PrQty;
     private javax.swing.JTextField SellerField;
+    private javax.swing.JLabel TotalAmount;
+    private javax.swing.JLabel ViewBills;
+    private javax.swing.JLabel ViewSells;
     private javax.swing.JButton addBillButton;
     private javax.swing.JTable bill_items_list;
     private javax.swing.JTable items_list;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
